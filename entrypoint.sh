@@ -47,12 +47,12 @@ if [ -z "${WIREGUARD_CONFIG}" ]; then
 fi
 
 log "INFO" "Copy of '${WIREGUARD_CONFIG}' ..."
-cp -f "${WIREGUARD_CONFIG}" "/etc/wireguard/wg.conf"
+cp -f "${WIREGUARD_CONFIG}" "/etc/wireguard/wg0.conf"
 
 log "INFO" "Starting WireGuard ..."
-wg-quick up wg
+wg-quick up wg0
 
-if ! ip -o -f inet addr show dev wg; then
+if ! ip -o -f inet addr show dev wg0; then
     log "ERROR" "Error during WireGuard startup"
     exit 1
 fi
