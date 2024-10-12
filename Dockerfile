@@ -1,6 +1,3 @@
-# docker build -t ghcr.io/jbatonnet/socks5-wireguard:latest .
-# docker push ghcr.io/jbatonnet/socks5-wireguard:latest
-
 FROM alpine:3.20
 
 # Install 3proxy to /usr/local/bin

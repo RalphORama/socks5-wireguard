@@ -40,8 +40,6 @@ export ENTRYPOINT_PID="${BASHPID}"
 trap "on_kill" EXIT
 trap "on_kill" SIGINT
 
-
-
 # WireGuard
 
 if [ -z "${WIREGUARD_CONFIG}" ]; then
@@ -62,17 +60,10 @@ fi
 
 log "INFO" "WireGuard is running"
 
-
-
 # 3proxy
-
 log "INFO" "Starting 3proxy ..."
-
 spawn 3proxy "/etc/3proxy.cfg"
-
 log "INFO" "3proxy is running"
-
-
 
 # iptables
 
@@ -92,8 +83,5 @@ log "INFO" "3proxy is running"
 # ip -4 rule add prio 20 table main suppress_prefixlength 0
 
 # log "INFO" "Updated iptables"
-
-
-
 
 join
