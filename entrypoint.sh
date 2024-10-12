@@ -50,7 +50,7 @@ cp -f "${WIREGUARD_CONFIG}" "/etc/wireguard/wg.conf"
 
 log "INFO" "Starting WireGuard ..."
 
-wg-quick up wg
+wg-quick up wg.conf
 
 if ! ip -o -f inet addr show dev wg; then
     log "ERROR" "Error during WireGuard startup"
