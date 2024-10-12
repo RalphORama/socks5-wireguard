@@ -41,7 +41,6 @@ trap "on_kill" EXIT
 trap "on_kill" SIGINT
 
 # WireGuard
-
 if [ -z "${WIREGUARD_CONFIG}" ]; then
     log "ERROR" "Missing WireGuard config"
     exit 1

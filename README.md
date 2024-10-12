@@ -1,4 +1,4 @@
-# WireGuard to SOCKS5/HTTP Proxy Docker Image
+# Docker Image - SOCKS5 Proxy entry to WireGuard target
 
 [Original source](https://github.com/curve25519xsalsa20poly1305/docker-wireguard)
 
