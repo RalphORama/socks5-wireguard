@@ -1,5 +1,13 @@
 FROM alpine:3.20
 
+LABEL org.opencontainers.image.title="socks5-wireguard"
+LABEL org.opencontainers.image.description="Create a SOCKS5 server using a WireGuard config"
+LABEL org.opencontainers.image.authors="RalphORama"
+LABEL org.opencontainers.image.url="https://github.com/RalphORama/socks5-wireguard/pkgs/container/socks5-wireguard"
+LABEL org.opencontainers.image.documentation="https://github.com/RalphORama/socks5-wireguard/blob/main/README.md"
+LABEL org.opencontainers.image.source="https://github.com/RalphORama/socks5-wireguard.git"
+LABEL org.opencontainers.image.licenses="AGPL-3.0-or-later"
+
 # Install dependencies
 RUN apk add --no-cache \
     bash \
