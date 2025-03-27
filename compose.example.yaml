@@ -1,0 +1,50 @@
+services:
+  socks5-wireguard:
+    image: ghcr.io/ralphorama/socks5-wireguard:latest
+
+    container_name: socks5-wireguard
+
+    environment:
+      WIREGUARD_CONFIG: "socks5-wireguard.conf"
+      SOCKS5_PROXY_PORT: "1080"
+      HTTP_PROXY_PORT: "3128"
+      # Set this to any URL that will respond to a curl request through the proxy
+      HEALTHCHECK_ENDPOINT: "http://captive.apple.com"
+
+    # Prefix binds with 127.0.0.1 to only listen on localhost of the host machine
+    ports:
+      - "127.0.0.1:${SOCKS5_PROXY_PORT:-1080}:${SOCKS5_PROXY_PORT:-1080}"
+      - "127.0.0.1:${HTTP_PROXY_PORT:-3128}:${HTTP_PROXY_PORT:-3128}"
+
+    volumes:
+      - "./socks5-wireguard:/etc/socks5-wireguard"
+      # Uncomment if you want to edit the 3proxy config file
+      #- "./3proxy:/etc/3proxy"
+
+    # cap_add NET_ADMIN and privileged: true are required for net configuration
+    # within the container
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+    # You may also need to uncomment this section to get things working fully
+    # devices:
+    #   - "/dev/net/tun:/dev/net/tun"
+
+    # Healthcheck makes sure the proxy can actually connect to the internet.
+    # You can use this with other services, i.e. by specifying
+    #   depends_on.socks5-wireguard.condition=service_healthy
+    #   to make those services wait until the proxy is up to launch.
+    # See:
+    #   - https://docs.docker.com/reference/compose-file/services/#depends_on
+    #   - https://docs.docker.com/reference/compose-file/services/#healthcheck
+    healthcheck:
+      # set this to true if you don't want to run the health check.
+      disable: false
+      test: [ "CMD-SHELL", "curl --fail --fail-early -x socks5h://127.0.0.1:${SOCKS5_PROXY_PORT:-1080} ${HEALTHCHECK_ENDPOINT:-http://captive.apple.com}" ]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+      start_interval: 5s
+
+    restart: unless-stopped
