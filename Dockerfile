@@ -1,36 +1,41 @@
 FROM alpine:3.20
 
-# Install 3proxy to /usr/local/bin
-ARG THREEPROXY_VERSION=0.9.4
-RUN apk add alpine-sdk && \
-    export DIR=$(mktemp -d) && cd $DIR && \
-    wget https://github.com/3proxy/3proxy/archive/refs/tags/${THREEPROXY_VERSION}.tar.gz && tar -xf ${THREEPROXY_VERSION}.tar.gz && mv 3proxy* 3proxy && \
-    cd 3proxy && \
-    make -f Makefile.Linux || true && \
-    mv bin/3proxy /usr/local/bin/ && \
-    cd && rm -rf $DIR && \
-    apk del alpine-sdk
+# Install dependencies
+RUN apk add --no-cache \
+    bash \
+    ca-certificates \
+    curl \
+    ip6tables \
+    wireguard-tools
 
-# Install other dependencies
-RUN apk add --no-cache bash curl wget wireguard-tools openresolv ip6tables libgcc libstdc++ gnutls expat sqlite-libs c-ares openssl
+# Crazy workaround for 3proxy installations failing
+# see https://gitlab.alpinelinux.org/alpine/aports/-/issues/15543#note_493627
+RUN addgroup -S 3proxy && \
+    adduser -S -D -h /var/log/3proxy -s /sbin/nologin -G 3proxy -g 3proxy 3proxy && \
+    rm -rf /var/log/3proxy && \
+    touch /var/log/3proxy && \
+    chown 3proxy:3proxy /var/log/3proxy && \
+    apk -vv add \
+        --no-cache \
+        --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
+        3proxy
+
+RUN mkdir -p /etc/socks5-wireguard /etc/3proxy
 
 # Prepare entrypoint and configuration
 COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
-COPY 3proxy.cfg /etc/3proxy.cfg
+COPY 3proxy.cfg /etc/defaults/3proxy.cfg
 
 # Wireguard Options
-ENV     WIREGUARD_CONFIG                ""
-ENV     WIREGUARD_UP                    ""
+ENV WIREGUARD_CONFIG    "socks5-wireguard.conf"
 
-# Proxy Options
-ENV     PROXY_UP                        ""
+# 3proxy Ports configuration
+ENV SOCKS5_PROXY_PORT="1080"
+ENV HTTP_PROXY_PORT="3128"
 
-# Proxy Ports Options
-ENV     SOCKS5_PROXY_PORT               "1080"
-ENV     HTTP_PROXY_PORT                 "3128"
+RUN mkdir -p /etc/socks5-wireguard
 
-ENV     DAEMON_MODE                     "false"
+VOLUME [ "/etc/socks5-wireguard" ]
+VOLUME [ "/etc/3proxy" ]
 
 ENTRYPOINT  [ "entrypoint.sh" ]
