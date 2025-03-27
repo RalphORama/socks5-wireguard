@@ -1,5 +1,6 @@
 .git/
 .github/
+3proxy/
 socks5-wireguard/
 
 .editorconfig
