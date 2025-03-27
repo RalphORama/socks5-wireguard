@@ -1,0 +1,6 @@
+.git/
+.github/
+socks5-wireguard/
+
+.editorconfig
+README.md
