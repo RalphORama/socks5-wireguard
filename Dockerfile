@@ -27,7 +27,7 @@ COPY entrypoint.sh /usr/local/bin/
 COPY 3proxy.cfg /etc/defaults/3proxy.cfg
 
 # Wireguard Options
-ENV WIREGUARD_CONFIG    "socks5-wireguard.conf"
+ENV WIREGUARD_CONFIG="socks5-wireguard.conf"
 
 # 3proxy Ports configuration
 ENV SOCKS5_PROXY_PORT="1080"
