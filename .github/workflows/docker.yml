@@ -64,6 +64,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
 
     - name: Build and push Docker image
+      id: build_push
       uses: docker/build-push-action@v6
       with:
         context: .
@@ -76,17 +77,10 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    - name: Generate image digest
-      id: digest
-      run: |
-        DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest | sed -e "s|${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}@||g" | sed -e "s|${{ env.IMAGE_NAME }}@||g")
-        echo "latest_digest=$DIGEST" >> "$GITHUB_OUTPUT"
-
     - name: Publish Docker image attestation
       uses: actions/attest-build-provenance@v2
       with:
         subject-name: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}
-        subject-digest: ${{ steps.digest.outputs.latest_digest }}
+        subject-digest: ${{ steps.build_push.outputs.digest }}
         push-to-registry: true
         show-summary: true
-        github-token: ${{ secrets.GITHUB_TOKEN }}
