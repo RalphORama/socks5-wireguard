@@ -16,17 +16,11 @@ RUN apk add --no-cache \
     ip6tables \
     wireguard-tools
 
-# Crazy workaround for 3proxy installations failing
-# see https://gitlab.alpinelinux.org/alpine/aports/-/issues/15543#note_493627
-RUN addgroup -S 3proxy && \
-    adduser -S -D -h /var/log/3proxy -s /sbin/nologin -G 3proxy -g 3proxy 3proxy && \
-    rm -rf /var/log/3proxy && \
-    touch /var/log/3proxy && \
-    chown 3proxy:3proxy /var/log/3proxy && \
-    apk -vv add \
-        --no-cache \
-        --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
-        3proxy
+# install 3proxy from testing repo
+RUN apk add \
+    --no-cache \
+    --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
+    3proxy
 
 RUN mkdir -p /etc/socks5-wireguard /etc/3proxy
 
