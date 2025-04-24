@@ -14,8 +14,6 @@ env:
   CONTAINER_REGISTRY: "ghcr.io"
   IMAGE_NAME: ${{ github.repository }}
   DOCKER_PLATFORMS: "linux/amd64,linux/arm64"
-  # https://github.com/orgs/community/discussions/45969#discussioncomment-5334871
-  BUILDX_NO_DEFAULT_ATTESTATIONS: 1
 
 jobs:
   docker:
@@ -27,22 +25,8 @@ jobs:
       id-token: write
       attestations: write
 
-    strategy:
-      matrix:
-        platform:
-          - linux/amd64
-          - linux/arm64
-
     steps:
     - uses: actions/checkout@v4
-
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-      with:
-        platforms: ${{ matrix.platform }}
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
 
     - id: vars
       run: |
@@ -71,6 +55,14 @@ jobs:
           type=raw,value=latest,enable={{is_default_branch}},priority=2000
           type=schedule
 
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      with:
+        platforms: ${{ env.DOCKER_PLATFORMS }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
     - name: Build and push Docker image
       id: build_push
       uses: docker/build-push-action@v6
@@ -78,12 +70,12 @@ jobs:
         context: .
         # Only push if we've pushed code to the default (main) branch
         push: ${{ steps.vars.outputs.should_push == 'true' }}
-        platforms: ${{ matrix.platform }}
+        platforms: ${{ env.DOCKER_PLATFORMS }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         annotations: ${{ steps.meta.outputs.annotations }}
-        cache-from: type=gha,scope=buildkit-${{ matrix.platform }}
-        cache-to: type=gha,mode=max,scope=buildkit-${{ matrix.platform }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Publish Docker image attestation
       uses: actions/attest-build-provenance@v2
