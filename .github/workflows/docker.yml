@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   schedule:
     # Times are UTC so this *should* run at midnight Eastern... :^)
-    - cron: "0 4 * * *"
+    - cron: "0 4 * * 1"
 
 # Wish I could do this with a matrix but it doesn't play nice with
 # package publishing
@@ -14,6 +14,8 @@ env:
   CONTAINER_REGISTRY: "ghcr.io"
   IMAGE_NAME: ${{ github.repository }}
   DOCKER_PLATFORMS: "linux/amd64,linux/arm64"
+  # https://github.com/orgs/community/discussions/45969#discussioncomment-5334871
+  BUILDX_NO_DEFAULT_ATTESTATIONS: 1
 
 jobs:
   docker:
