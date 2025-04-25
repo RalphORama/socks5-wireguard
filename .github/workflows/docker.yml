@@ -14,6 +14,7 @@ env:
   CONTAINER_REGISTRY: "ghcr.io"
   IMAGE_NAME: ${{ github.repository }}
   DOCKER_PLATFORMS: "linux/amd64,linux/arm64"
+  # Eliminate "unknown/unknown" arch in ghcr
   # https://github.com/orgs/community/discussions/45969#discussioncomment-5334871
   BUILDX_NO_DEFAULT_ATTESTATIONS: 1
 
@@ -56,6 +57,8 @@ jobs:
         tags: |
           type=raw,value=latest,enable={{is_default_branch}},priority=2000
           type=schedule
+      env:
+        DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
