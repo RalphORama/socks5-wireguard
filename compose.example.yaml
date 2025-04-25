@@ -17,18 +17,16 @@ services:
       - "127.0.0.1:${HTTP_PROXY_PORT:-3128}:${HTTP_PROXY_PORT:-3128}"
 
     volumes:
-      - "./socks5-wireguard:/etc/socks5-wireguard"
+      - "./socks5-wireguard:/etc/socks5-wireguard:ro"
       # Uncomment if you want to edit the 3proxy config file
       #- "./3proxy:/etc/3proxy"
 
-    # cap_add NET_ADMIN and privileged: true are required for net configuration
-    # within the container
+    # elevated privileges are required for proxy networking functionality
     cap_add:
       - NET_ADMIN
     privileged: true
-    # You may also need to uncomment this section to get things working fully
-    # devices:
-    #   - "/dev/net/tun:/dev/net/tun"
+    devices:
+      - "/dev/net/tun:/dev/net/tun"
 
     # Healthcheck makes sure the proxy can actually connect to the internet.
     # You can use this with other services, i.e. by specifying
